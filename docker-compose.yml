@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: postfixadmin
+      MYSQL_USER: postfixadmin
+      MYSQL_PASSWORD: example
+
+  postfixadmin:
+    depends_on:
+      - db
+    image: postfixadmin
+    container_name: postfixadmin
+    ports:
+      - 8000:80
+    restart: always
+    environment:
+      POSTFIXADMIN_DB_TYPE: mysqli
+      POSTFIXADMIN_DB_HOST: db
+      POSTFIXADMIN_DB_USER: postfixadmin
+      POSTFIXADMIN_DB_NAME: postfixadmin
+      POSTFIXADMIN_DB_PASSWORD: example
+
+#   postfix:
+#     image: catatnight/postfix
+#     container_name: postfix
+#     environment:
+#       - maildomain=rfidconnect.pt
+#       - smtp_user=xpto:xpto
+#       - mynetworks=192.168.1.0/24
+#     ports:
+#       - "25:25"
+#     volumes:
+#       - ./postfix/data:/data
+
+#   dovecot:
+#     image: dovecot/dovecot
+#     container_name: dovecot
+#     volumes:
+#       - ./dovecot1:/etc/dovecot
+#     depends_on:
+#       - postfix
+
+  postfix:
+    image: catatnight/postfix
+    container_name: postfix
+    environment:
+      - MAIL_DOMAIN=example.com
+      - MYNETWORKS=192.168.1.0/24
+      - SMTP_USERNAME=user
+      - SMTP_PASSWORD=password
+    ports:
+      - "25:25"
+      - "587:587"
+    networks:
+      - postfix-network
+    restart: always
+
+networks:
+  postfix-network:
+    driver: bridge
