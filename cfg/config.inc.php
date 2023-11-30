@@ -98,10 +98,10 @@ function language_hook($PALANG, $language) {
 // pgsql = PostgreSQL
 // sqlite = SQLite 3
 $CONF['database_type'] = 'mysqli';
-$CONF['database_host'] = 'localhost';
-$CONF['database_user'] = 'postfix';
-$CONF['database_password'] = 'postfixadmin';
-$CONF['database_name'] = 'postfix';
+$CONF['database_host'] = 'db';
+$CONF['database_user'] = 'postfixadmin';
+$CONF['database_password'] = 'example';
+$CONF['database_name'] = 'postfixadmin';
 
 // Database SSL Config (PDO/MySQLi only)
 $CONF['database_use_ssl'] = false;

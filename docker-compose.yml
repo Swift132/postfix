@@ -6,9 +6,12 @@ services:
     container_name: postfix
     ports:
       - "25:25"
+      - "110:110"
     environment:
-      - maildomain=mail.teste.com
-      - smtp_user=user1:pwd1,user2:pwd2
+      - maildomain=xpto.xpto
+      - ALLOWED_SENDER_DOMAINS=rfidconnect.pt
+      - smtp_user=user1:xpto2005,user2:xpto2005
+      - ALLOWED_NETWORKS=0.0.0.0/0
     restart: unless-stopped
 
   db:
@@ -36,3 +39,21 @@ services:
       POSTFIXADMIN_SETUP_PASSWORD: xpto
     volumes:
       - ./cfg/config.inc.php:/var/www/html/config.inc.php
+      - ./cfg/config.local.php:/var/www/html/config.local.php
+  
+  roundcube:
+    image: roundcube/roundcubemail
+    container_name: roundcube
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=pop3://postfix  # Alterado de imap para pop3
+      - ROUNDCUBEMAIL_SMTP_SERVER=postfix
+      - ROUNDCUBEMAIL_DEFAULT_PORT=110  # Alterado de 143 para 110 para POP3
+      - ROUNDCUBEMAIL_SMTP_PORT=25
+      - ROUNDCUBEMAIL_IMAP_PORT=110  # Adicionado para POP3
+    depends_on:
+      - postfix
+    volumes:
+      - ./roundcube/config:/var/www/html/config
