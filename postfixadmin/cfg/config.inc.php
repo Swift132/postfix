@@ -149,13 +149,13 @@ $CONF['database_tables'] = array (
 // This will be used to send emails from to create mailboxes and
 // from Send Email / Broadcast message pages.
 // Leave blank to send email from the logged-in Admin's Email address.
-$CONF['admin_email'] = 'admin@mail.example.com';
+$CONF['admin_email'] = 'admin@rfidconnect.pt';
 
 // Define the smtp password for admin_email.
 // This will be used to send emails from to create mailboxes and
 // from Send Email / Broadcast message pages.
 // Leave blank to send emails without authentification
-$CONF['admin_smtp_password'] = 'xpto';
+$CONF['admin_smtp_password'] = '';
 
 // Site admin name
 // This will be used as signature in notification messages
@@ -164,7 +164,7 @@ $CONF['admin_name'] = 'Postmaster';
 // Mail Server
 // Hostname (FQDN) of your mail server.
 // This is used to send email to Postfix in order to create mailboxes.
-$CONF['smtp_server'] = 'localhost';
+$CONF['smtp_server'] = 'postfix';
 $CONF['smtp_port'] = '25';
 
 // SMTP Client
@@ -246,7 +246,7 @@ $CONF['generate_password'] = 'NO';
 // Show Password
 // Always show password after adding a mailbox or admin.
 // If you want to always see what password was set set this to 'YES'.
-$CONF['show_password'] = 'NO';
+$CONF['show_password'] = 'YES';
 
 // Page Size
 // Set the number of entries that you would like to see
@@ -468,7 +468,7 @@ $CONF['backup'] = 'NO';
 $CONF['sendmail'] = 'YES';
 // Set this to YES if you want to allow non-super-admins to
 // send mails to their users
-$CONF['sendmail_all_admins'] = 'NO';
+$CONF['sendmail_all_admins'] = 'YES';
 
 // Logging
 // If you don't want logging set this to 'NO';

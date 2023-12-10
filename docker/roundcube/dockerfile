@@ -1,0 +1,6 @@
+FROM roundcube/roundcubemail
+
+RUN apt update && apt install -y iputils-ping nano
+
+# Path: docker/roundcube/config/config.inc.php
+

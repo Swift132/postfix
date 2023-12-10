@@ -1,0 +1,3 @@
+FROM catatnight/postfix
+
+RUN apt update && apt install -y telnet iputils-ping nano

@@ -2,31 +2,40 @@ version: '3'
 
 services:
   postfix:
-    image: catatnight/postfix
+    build: ./docker/postfix/.
     container_name: postfix
     ports:
       - "25:25"
-      - "110:110"
     environment:
-      - maildomain=xpto.xpto
+      - maildomain=rfidconnect.pt
       - ALLOWED_SENDER_DOMAINS=rfidconnect.pt
       - smtp_user=user1:xpto2005,user2:xpto2005
-      - ALLOWED_NETWORKS=0.0.0.0/0
+      - RELAY_NETWORKS=172.17.0.0/16
     restart: unless-stopped
+    volumes:
+      - ./postfix/main.cf:/etc/postfix/main.cf
+    networks:
+      - xpto
 
   db:
     image: mysql:5.7
+    container_name: db
     restart: unless-stopped
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1
       MYSQL_DATABASE: postfixadmin
       MYSQL_USER: postfixadmin
       MYSQL_PASSWORD: example
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - xpto
 
   postfixadmin:
-    depends_on:
-      - db
     image: postfixadmin
+    container_name: postfixadmin
     ports:
       - 8000:80
     restart: unless-stopped
@@ -38,22 +47,44 @@ services:
       POSTFIXADMIN_DB_PASSWORD: example
       POSTFIXADMIN_SETUP_PASSWORD: xpto
     volumes:
-      - ./cfg/config.inc.php:/var/www/html/config.inc.php
-      - ./cfg/config.local.php:/var/www/html/config.local.php
-  
+      - ./postfixadmin/cfg/config.inc.php:/var/www/html/config.inc.php
+      - ./postfixadmin/cfg/config.local.php:/var/www/html/config.local.php
+    networks:
+      - xpto
+    depends_on:
+      - db
+    
+  dovecot:
+    image: dovecot/dovecot
+    container_name: dovecot
+    environment:
+      - DEFAULT_PASS_SCHEME=SHA512-CRYPT
+      - DOVECOT_SQL_DRIVER=mysql
+      - DOVECOT_SQL_CONNECT=host=db dbname=postfixadmin user=postfixadmin password=example
+    ports:
+      - "143:143"
+    networks:
+      - xpto
+    volumes:
+      - ./dovecot/dovecot.conf:/etc/dovecot/dovecot.conf
+      - ./dovecot/dovecot-sql.conf.ext:/etc/dovecot/dovecot-sql.conf.ext
+    depends_on:
+      - db
+
   roundcube:
     image: roundcube/roundcubemail
     container_name: roundcube
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=imap://dovecot
+      - ROUNDCUBEMAIL_SMTP_SERVER=postfix
+      - ROUNDCUBEMAIL_DEFAULT_PORT=143
+      - ROUNDCUBEMAIL_SMTP_PORT=25
     ports:
       - "8081:80"
-    restart: unless-stopped
-    environment:
-      - ROUNDCUBEMAIL_DEFAULT_HOST=pop3://postfix  # Alterado de imap para pop3
-      - ROUNDCUBEMAIL_SMTP_SERVER=postfix
-      - ROUNDCUBEMAIL_DEFAULT_PORT=110  # Alterado de 143 para 110 para POP3
-      - ROUNDCUBEMAIL_SMTP_PORT=25
-      - ROUNDCUBEMAIL_IMAP_PORT=110  # Adicionado para POP3
+    networks:
+      - xpto
     depends_on:
-      - postfix
-    volumes:
-      - ./roundcube/config:/var/www/html/config
+      - db
+
+networks:
+  xpto:

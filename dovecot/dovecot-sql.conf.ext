@@ -1,0 +1,6 @@
+driver = mysql
+connect = host=db dbname=postfixadmin user=postfixadmin password=example
+default_pass_scheme = SHA512-CRYPT
+
+password_query = SELECT username as user, password, 'Y' as username, 'Y' as domain FROM mailbox WHERE username = '%u' AND active = '1'
+user_query = SELECT CONCAT('/var/vmail/', maildir) as home, CONCAT('maildir:/var/vmail/', maildir) as mail, 150 as uid, 8 as gid, 'Y' as quota FROM mailbox WHERE username = '%u' AND active = '1'
